@@ -1,1 +1,295 @@
-{"pages":[{"name":"乐视电视","rows":[{"keys":[{"name":"🔴","code":"32A650AF","bits":"32","protocol":"NEC"}]},{"keys":[{"name":"电视","code":"32A6C23D","bits":"32","protocol":"NEC"},{"name":"电脑","code":"32A622DD","bits":"32","protocol":"NEC"},{"name":"HDMI","code":"32A6827D","bits":"32","protocol":"NEC"},{"name":"视频","code":"32A6E21D","bits":"32","protocol":"NEC"}]},{"keys":[{"name":"1⃣️","code":"32A6807F","bits":"32","protocol":"NEC"},{"name":"2⃣️","code":"32A640BF","bits":"32","protocol":"NEC"},{"name":"3⃣️","code":"32A6C03F","bits":"32","protocol":"NEC"}]},{"keys":[{"name":"4⃣️","code":"32A620DF","bits":"32","protocol":"NEC"},{"name":"5⃣️","code":"32A6A05F","bits":"32","protocol":"NEC"},{"name":"6⃣️","code":"32A6609F","bits":"32","protocol":"NEC"}]},{"keys":[{"name":"7⃣️","code":"32A6E01F","bits":"32","protocol":"NEC"},{"name":"8⃣️","code":"32A610EF","bits":"32","protocol":"NEC"},{"name":"9⃣️","code":"32A6906F","bits":"32","protocol":"NEC"}]},{"keys":[{"name":"回看","code":"32A648B7","bits":"32","protocol":"NEC"},{"name":"0⃣️","code":"32A6A25D","bits":"32","protocol":"NEC"},{"name":"列表","code":"32A61AE5","bits":"32","protocol":"NEC"}]},{"keys":[{"name":"音量⬆️","code":"32A6A857","bits":"32","protocol":"NEC"},{"name":"🔇","code":"32A6F00F","bits":"32","protocol":"NEC"},{"name":"频道🔺","code":"32A6F807","bits":"32","protocol":"NEC"}]},{"keys":[{"name":"音量⬇️","code":"32A638C7","bits":"32","protocol":"NEC"},{"name":"设置","code":"32A600FF","bits":"32","protocol":"NEC"},{"name":"频道🔻","code":"32A67887","bits":"32","protocol":"NEC"}]},{"keys":[{"name":"显示","code":"32A602FD","bits":"32","protocol":"NEC"},{"name":"⬆️","code":"32A6D02F","bits":"32","protocol":"NEC"},{"name":"输入源","code":"32A630CF","bits":"32","protocol":"NEC"}]},{"keys":[{"name":"⬅️","code":"32A608F7","bits":"32","protocol":"NEC"},{"name":"🆗","code":"32A6B04F","bits":"32","protocol":"NEC"},{"name":"➡️","code":"32A68877","bits":"32","protocol":"NEC"}]},{"keys":[{"name":"菜单","code":"32A6EC13","bits":"32","protocol":"NEC"},{"name":"⬇️","code":"32A6708F","bits":"32","protocol":"NEC"},{"name":"↩️","code":"32A6B847","bits":"32","protocol":"NEC"}]},{"keys":[{"name":"上一首","code":"32A6CA35","bits":"32","protocol":"NEC"},{"name":"首页","code":"32A66897","bits":"32","protocol":"NEC"},{"name":"下一首","code":"32A6DA25","bits":"32","protocol":"NEC"}]},{"keys":[{"name":"⏪","code":"32A6EA15","bits":"32","protocol":"NEC"},{"name":"⏯","code":"32A6C837","bits":"32","protocol":"NEC"},{"name":"⏹️","code":"32A628D7","bits":"32","protocol":"NEC"},{"name":"⏩","code":"32A62AD5","bits":"32","protocol":"NEC"}]}]}]}
+{
+    "pages": [
+        {
+            "name": "乐视电视",
+            "rows": [
+                {
+                    "keys": [
+                        {
+                            "name": "🔴",
+                            "code": "100bcbd",
+                            "bits": "48",
+                            "protocol": "PANASONIC"
+                        }
+                    ]
+                },
+                {
+                    "keys": [
+                        {
+                            "name": "Key4",
+                            "code": "c15",
+                            "bits": "12",
+                            "protocol": "RC5"
+                        },
+                        {
+                            "name": "Key5",
+                            "code": "416",
+                            "bits": "12",
+                            "protocol": "RC5"
+                        },
+                        {
+                            "name": "Key6",
+                            "code": "417",
+                            "bits": "12",
+                            "protocol": "RC5"
+                        },
+                        {
+                            "name": "⏯",
+                            "code": "535",
+                            "bits": "12",
+                            "protocol": "RC5"
+                        }
+                    ]
+                },
+                {
+                    "keys": [
+                        {
+                            "name": "1⃣️",
+                            "code": "32A6807F",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        },
+                        {
+                            "name": "2⃣️",
+                            "code": "32A640BF",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        },
+                        {
+                            "name": "3⃣️",
+                            "code": "32A6C03F",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        }
+                    ]
+                },
+                {
+                    "keys": [
+                        {
+                            "name": "4⃣️",
+                            "code": "32A620DF",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        },
+                        {
+                            "name": "5⃣️",
+                            "code": "32A6A05F",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        },
+                        {
+                            "name": "6⃣️",
+                            "code": "32A6609F",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        }
+                    ]
+                },
+                {
+                    "keys": [
+                        {
+                            "name": "7⃣️",
+                            "code": "32A6E01F",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        },
+                        {
+                            "name": "8⃣️",
+                            "code": "32A610EF",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        },
+                        {
+                            "name": "9⃣️",
+                            "code": "32A6906F",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        }
+                    ]
+                },
+                {
+                    "keys": [
+                        {
+                            "name": "回看",
+                            "code": "32A648B7",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        },
+                        {
+                            "name": "0⃣️",
+                            "code": "32A6A25D",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        },
+                        {
+                            "name": "列表",
+                            "code": "32A61AE5",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        }
+                    ]
+                },
+                {
+                    "keys": [
+                        {
+                            "name": "音量⬆️",
+                            "code": "32A6A857",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        },
+                        {
+                            "name": "🔇",
+                            "code": "32A6F00F",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        },
+                        {
+                            "name": "频道🔺",
+                            "code": "32A6F807",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        }
+                    ]
+                },
+                {
+                    "keys": [
+                        {
+                            "name": "音量⬇️",
+                            "code": "32A638C7",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        },
+                        {
+                            "name": "设置",
+                            "code": "32A600FF",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        },
+                        {
+                            "name": "频道🔻",
+                            "code": "32A67887",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        }
+                    ]
+                },
+                {
+                    "keys": [
+                        {
+                            "name": "显示",
+                            "code": "32A602FD",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        },
+                        {
+                            "name": "⬆️",
+                            "code": "32A6D02F",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        },
+                        {
+                            "name": "输入源",
+                            "code": "32A630CF",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        }
+                    ]
+                },
+                {
+                    "keys": [
+                        {
+                            "name": "⬅️",
+                            "code": "32A608F7",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        },
+                        {
+                            "name": "🆗",
+                            "code": "32A6B04F",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        },
+                        {
+                            "name": "➡️",
+                            "code": "32A68877",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        }
+                    ]
+                },
+                {
+                    "keys": [
+                        {
+                            "name": "菜单",
+                            "code": "32A6EC13",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        },
+                        {
+                            "name": "⬇️",
+                            "code": "32A6708F",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        },
+                        {
+                            "name": "↩️",
+                            "code": "32A6B847",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        }
+                    ]
+                },
+                {
+                    "keys": [
+                        {
+                            "name": "上一首",
+                            "code": "32A6CA35",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        },
+                        {
+                            "name": "首页",
+                            "code": "32A66897",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        },
+                        {
+                            "name": "下一首",
+                            "code": "32A6DA25",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        }
+                    ]
+                },
+                {
+                    "keys": [
+                        {
+                            "name": "⏪",
+                            "code": "32A6EA15",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        },
+                        {
+                            "name": "⏯",
+                            "code": "32A6C837",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        },
+                        {
+                            "name": "⏹️",
+                            "code": "32A628D7",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        },
+                        {
+                            "name": "⏩",
+                            "code": "32A62AD5",
+                            "bits": "32",
+                            "protocol": "NEC"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
