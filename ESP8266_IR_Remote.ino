@@ -9,20 +9,36 @@
 #include <WiFiManager.h>          //https://github.com/tzapu/WiFiManager WiFi Configuration Magic
 #include <FS.h>
 #include <WiFiUdp.h>
+#include <ArduinoMqttClient.h>
 
 #define _OTA_
-//#define SerialOn
+#define SerialOn
 
 #ifdef _OTA_
 #include <ArduinoOTA.h>
 #endif
+
+//21:27:22.754 -> Timestamp : 000012.796
+//21:27:22.754 -> Library   : v2.8.4
+//21:27:22.754 -> 
+//21:27:22.754 -> Protocol  : PANASONIC
+//21:27:22.754 -> Code      : 0x40040100BCBD (48 Bits)
+uint16_t PANASONIC_TV_POWER[99] = {
+  3514, 1702,  472, 396,  468, 1270,  494, 374,  494, 374,  496, 368,  500, 370,  498, 370,  472, 396,  472, 398,  472, 396,
+  466, 402,  494, 374,  494, 374,  494, 1244,  494, 368,  500, 368,  500, 370,  472, 396,  472, 396,  472, 396,  472, 398,
+  466, 402,  466, 402,  494, 1244,  494, 374,  494, 374,  496, 374,  494, 368,  500, 370,  472, 396,  472, 396,  472, 398,
+  472, 1266,  466, 402,  496, 1242,  494, 1238,  500, 1238,  470, 1266,  472, 396,  468, 402,  494, 1242,  496, 374,  494,
+  1238,  498, 1238,  472, 1268,  494, 1244,  494, 374,  494, 1238,  472};  // PANASONIC 40040100BCBD
+uint64_t PANASONIC_ADDRESS = 0x400400000000;
+//21:27:22.832 -> uint32_t command = 0x100BCBD;
+//uint64_t data = 0x40040100BCBD;
 
 namespace {
 const char* HOSTNAME = "esp8266-ir";
 }
 int SERIAL_SPEED = 115200;
 int LED_PIN = 1;
-int RECV_PIN = 0; //1:tx //an IR detector/demodulator is connected to GPIO  //D1
+int RECV_PIN = 0; //1:tx //an IR detector/demodulator is connected to GPIO  //D1 //D3 on a nodemcu
 int SEND_PIN = 3; //3:rx // D2 paired with a 1.6 Ohm resistor
 String CONFIG_PATH = "/config.json";
 String CONFIG_BACKUP_PATH = "/config.bak";
@@ -38,6 +54,15 @@ IRsend irsend(SEND_PIN);
 
 decode_results results1;        // Somewhere to store the results
 decode_results results;        // Somewhere to store the results
+decode_results results3;
+
+WiFiClient wifiClient;
+MqttClient mqttClient(wifiClient);
+
+const char broker[] = "192.168.1.84";
+int        port     = 1883;
+const char topic[]  = "ir_remote/learn";
+const char action_topic[]  = "ir_remote/action";
 
 unsigned long StrToUL(String str) {
   char tarray[15];
@@ -191,87 +216,111 @@ void handleIr() {
   }
 
   if (code != 0) {
-    Serial.println(code, HEX);
-
-    if (protocol == "NEC") {
+    int str_len = protocol.length() + 1;
+    char proto[str_len];
+    protocol.toCharArray(proto, str_len);
+    if (sendIrByCode(proto, code, bits)) {
       server.send(200, "text/html", webOutput);
-      irsend.sendNEC(code, bits);
-    } else if (protocol == "Sony") {
-      server.send(200, "text/html", webOutput);
-      irsend.sendSony(code, bits);
-    } else if (protocol == "Whynter") {
-      server.send(200, "text/html", webOutput);
-      irsend.sendWhynter(code, bits);
-    } else if (protocol == "LG") {
-      server.send(200, "text/html", webOutput);
-      irsend.sendLG(code, bits);
-    } else if (protocol == "RC5") {
-      server.send(200, "text/html", webOutput);
-      irsend.sendRC5(code, bits);
-    } else if (protocol == "RC6") {
-      server.send(200, "text/html", webOutput);
-      irsend.sendRC6(code, bits);
-    } else if (protocol == "DISH") {
-      server.send(200, "text/html", webOutput);
-      irsend.sendDISH(code, bits);
-    } else if (protocol == "SharpRaw") {
-      server.send(200, "text/html", webOutput);
-      irsend.sendSharpRaw(code, bits);
-    } else if (protocol == "Samsung") {
-      server.send(200, "text/html", webOutput);
-      irsend.sendSAMSUNG(code, bits);
     } else {
       server.send(404, "text/html", "Protocol not implemented!");
     }
   } else if (pronto != "") {
-    //pronto code
-    //blocks of 4 digits in hex
-    //preample is 0000 FREQ LEN1 LEN2
-    //followed by ON/OFF durations in FREQ cycles
-    //Freq needs a multiplier
-    //blocks seperated by %20
-    //we are ignoring LEN1 & LEN2 for this use case as not allowing for repeats
-    //just pumping all
-    int spacing = 5;
-    int len = pronto.length();
-    int out_len = ((len - 4) / spacing) - 3;
-    uint16_t prontoCode[out_len];
-    unsigned long timeperiod;
-    unsigned long multiplier = .241246;
-
-    int pos = 0;
-    unsigned long hz;
-    if (pronto.substring(pos, 4) != "0000") {
-      server.send(404, "text/html", "unknown pronto format!");
-      //unknown pronto format
-    } else {
-      pos += spacing;
-
-      hz = strtol(pronto.substring(pos, pos + 4).c_str(), NULL, 16);
-      hz = (hz * .241246);
-      hz = 1000000 / hz;
-      //XXX TIMING IS OUT
-      timeperiod = 1000000 / hz;
-      pos += spacing; //hz
-      pos += spacing; //LEN1
-      pos += spacing; //LEN2
-      delay(0);
-      for (int i = 0; i < out_len; i++) {
-        prontoCode[i] = (strtol(pronto.substring(pos, pos + 4).c_str(), NULL,
-            16) * timeperiod) + 0.5;
-        pos += spacing;
-      }
-      //sendRaw
-      yield();
-
-      irsend.sendRaw(prontoCode, out_len, hz / 1000);
+    if (sendIrByPronto(pronto)) {
       server.send(200, "text/html", "pronto code!");
+    } else {
+      server.send(404, "text/html", "unknown pronto format!");
     }
-
   } else {
     server.send(404, "text/html", "Missing code or bits!");
   }
+}
 
+bool sendIrByCode(char* protocol, unsigned long code, int bits) {
+
+  bool result = true;
+  if (strcmp(protocol, "NEC") == 0) {
+    irsend.sendNEC(code, bits);
+  } else if (strcmp(protocol, "Sony") == 0) {
+    irsend.sendSony(code, bits);
+  } else if (strcmp(protocol, "Whynter") == 0) {
+    irsend.sendWhynter(code, bits);
+  } else if (strcmp(protocol, "LG") == 0) {
+    irsend.sendLG(code, bits);
+  } else if (strcmp(protocol, "RC5") == 0){
+    Serial.print("sending RC5 ");
+    Serial.print(code, HEX);
+    Serial.print(" ");
+    Serial.println(bits);
+    irsend.sendRC5(code, bits);
+  } else if (strcmp(protocol, "RC6") == 0) {
+    irsend.sendRC6(code, bits);
+  } else if (strcmp(protocol, "DISH") == 0) {
+    irsend.sendDISH(code, bits);
+  } else if (strcmp(protocol, "SharpRaw") == 0) {
+    irsend.sendSharpRaw(code, bits);
+  } else if (strcmp(protocol, "Samsung") == 0) {
+    irsend.sendSAMSUNG(code, bits);
+  } else if (strcmp(protocol, "Panasonic") == 0) {
+    Serial.print("sending Panasonic ");
+    Serial.print(code, HEX);
+    Serial.print(" ");
+    Serial.println(bits);    
+    // irsend.sendPanasonic64(code, bits);
+    uint64_t addrCommand = PANASONIC_ADDRESS + code;
+    irsend.sendPanasonic64(addrCommand);
+//    irsend.sendRaw(rawData,99,38);
+  
+  } else {
+    result = false;
+  }
+  return result;
+}
+
+bool sendIrByPronto(String pronto) {
+  //pronto code
+  //blocks of 4 digits in hex
+  //preample is 0000 FREQ LEN1 LEN2
+  //followed by ON/OFF durations in FREQ cycles
+  //Freq needs a multiplier
+  //blocks seperated by %20
+  //we are ignoring LEN1 & LEN2 for this use case as not allowing for repeats
+  //just pumping all
+  int spacing = 5;
+  int len = pronto.length();
+  int out_len = ((len - 4) / spacing) - 3;
+  uint16_t prontoCode[out_len];
+  unsigned long timeperiod;
+  unsigned long multiplier = .241246;
+  bool result = true;
+
+  int pos = 0;
+  unsigned long hz;
+  if (pronto.substring(pos, 4) != "0000") {
+    result = false;
+    //unknown pronto format
+  } else {
+    pos += spacing;
+
+    hz = strtol(pronto.substring(pos, pos + 4).c_str(), NULL, 16);
+    hz = (hz * .241246);
+    hz = 1000000 / hz;
+    //XXX TIMING IS OUT
+    timeperiod = 1000000 / hz;
+    pos += spacing; //hz
+    pos += spacing; //LEN1
+    pos += spacing; //LEN2
+    delay(0);
+    for (int i = 0; i < out_len; i++) {
+      prontoCode[i] = (strtol(pronto.substring(pos, pos + 4).c_str(), NULL,
+          16) * timeperiod) + 0.5;
+      pos += spacing;
+    }
+    //sendRaw
+    yield();
+
+    irsend.sendRaw(prontoCode, out_len, hz / 1000);
+    return result;
+  }
   setOnBoardLedOff();
 }
 
@@ -360,7 +409,7 @@ void learnHandler() {
 
   String proto = "";
   { // Grab an IR code
-    // dumpInfo(&results);           // Output the results
+    //dumpInfo(&results);           // Output the results
     switch (results.decode_type) {
     default:
     case UNKNOWN:
@@ -521,18 +570,119 @@ void setup(void) {
 
   server.onNotFound(handleNotFound);
 
+  // You can provide a unique client ID, if not set the library uses Arduino-millis()
+  // Each client must have a unique client ID
+  mqttClient.setId("ir_remote");
+
+  // You can provide a username and password for authentication
+  // mqttClient.setUsernamePassword("username", "password");  
+
+  Serial.println("starting connection to mqtt broker");
+  if (!mqttClient.connect(broker, port)) {
+    Serial.print("MQTT connection failed! Error code = ");
+    Serial.println(mqttClient.connectError());
+
+    while (1);
+  }
+
+  Serial.println("You're connected to the MQTT broker!");
+  Serial.println();
+
+  // set the message receive callback
+  mqttClient.onMessage(onMqttMessage);
+
+  Serial.print("Subscribing to topic: ");
+  Serial.println(action_topic);
+  Serial.println();
+
+  // subscribe to a topic
+  mqttClient.subscribe(action_topic);
+
+  // topics can be unsubscribed using:
+  // mqttClient.unsubscribe(topic);
+
+  Serial.print("Waiting for messages on topic: ");
+  Serial.println(action_topic);
+  Serial.println();
+
+
+
   server.begin();
-  Serial.println("HTTP server started");
+  Serial.println("HTTP server startedx");
   irrecv.enableIRIn();
 
   if (mdns.begin(HOSTNAME, WiFi.localIP())) {
     Serial.println("MDNS responder started");
   }
 
+
+
   setOnBoardLedOff();
 }
 
+void onMqttMessage(int messageSize) {
+
+  // we received a message, print out the topic and contents
+
+  Serial.print("Received a message with topic '");
+  Serial.print(mqttClient.messageTopic());
+  Serial.print("', length ");
+  Serial.print(messageSize);
+  Serial.println(" bytes:");
+
+  if (mqttClient.messageTopic().equalsIgnoreCase(action_topic)){
+    Serial.println("received action message");
+    char buffer[64];
+    int loc = 0;
+    while (mqttClient.available()) {
+      char aChar = mqttClient.read();
+//      Serial.print("loc=");
+//      Serial.print(loc);
+//      Serial.print(",char=");
+//      Serial.println(aChar);
+      if (loc <= sizeof(buffer) - 1) {
+        buffer[loc++] = aChar; 
+      } else {
+        Serial.print("x:");
+        Serial.println(mqttClient.read());
+      }
+
+    }
+    buffer[loc] = '\n';
+    char *parts[3];
+
+    int i=0;
+    char *ptr = strtok(buffer, ",");
+    while (ptr != NULL) {
+      if (i<3) {
+        parts[i++] = ptr;
+      }
+      ptr = strtok(NULL, ",");
+    }
+
+    unsigned long code = strtoul(parts[2], NULL, 16);
+    int bits = atoi(parts[1]);
+
+    Serial.print("protocol=");
+    Serial.println(parts[0]);
+    Serial.print("bits=");
+    Serial.println(bits);
+    Serial.print("msg=");
+    Serial.println(code, HEX);
+
+    sendIrByCode(parts[0], code, bits);
+    Serial.println("end action message");
+
+  }
+
+  Serial.println();
+}
+
 void loop(void) {
+
+  // call poll() regularly to allow the library to send MQTT keep alives which
+  // avoids being disconnected by the broker
+  mqttClient.poll();  
 
   server.handleClient();
   mdns.update();
@@ -546,7 +696,8 @@ void loop(void) {
     } else {
       String proto = "";
       { // Grab an IR code
-        // dumpInfo(&results);           // Output the results
+        //dumpInfo(&results);           // Output the results
+        // decodePanasonic(&results3);
         switch (results1.decode_type) {
         default:
         case UNKNOWN:
@@ -596,6 +747,12 @@ void loop(void) {
       }
       Serial.print("Signal recveived " + proto + " " + results1.bits + " ");
       Serial.println((unsigned long) results1.value, HEX);
+
+      
+      // send message, the Print interface can be used to set the message contents
+      mqttClient.beginMessage(topic);
+      mqttClient.print(proto + ":" + String((unsigned long) results.value, HEX) + ":" + results1.bits);
+      mqttClient.endMessage();
 
       irrecv.decode(&results);
     }
